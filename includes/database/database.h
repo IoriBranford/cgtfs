@@ -31,8 +31,8 @@
  * keeping stuff open and, thus, locked.
  *
  * @param[in,out]    db          Unitialized feed database instance to operate on.
- * @param[in]        db_path     /path/to/database.file
- * @param[in]        writable    0 to make connection read-only, else for otherwise
+ * @param[in]        db_path     /path/to/database.file or an empty string to create in-memory database
+ * @param[in]        writable    0 to make connection read-only, else for otherwise (in-memory is always writable)
  *
  * @returns          FEED_DB_SUCCESS or FEED_DB_ERROR (self-explanatory).
  *

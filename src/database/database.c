@@ -7,9 +7,16 @@ feed_db_status_t init_feed_db(feed_db_t *db, const char *db_path, int writable) 
     db->open = 0;
     db->in_transaction = 0;
 
-    db->rc = sqlite3_open_v2(db_path, &(db->conn),
-        writable ? (SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE) : (SQLITE_OPEN_READONLY),
-        NULL);
+    int flags = 0;
+    int in_memory = *db_path == '\0';
+    if (in_memory) {
+        writable = 1;
+        flags |= SQLITE_OPEN_MEMORY;
+    }
+    flags = writable ?
+        (SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE) : (SQLITE_OPEN_READONLY);
+
+    db->rc = sqlite3_open_v2(db_path, &(db->conn), flags, NULL);
 
     if (db->rc) {
         db->error_msg = strdup(sqlite3_errmsg(db->conn));
