@@ -73,7 +73,7 @@ include_directories(${include_dirs})
 ## sqlite3 dependency
 ## -----------------------------------------------------------------
 
-add_subdirectory("${CMAKE_SOURCE_DIR}/third_party/sqlite3")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite3")
 
 
 ## Library
