@@ -3,7 +3,7 @@
 
 include(ExternalProject)
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11)
 project(cgtfs VERSION 0.5.0 LANGUAGES C)
 
 
