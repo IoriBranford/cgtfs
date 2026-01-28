@@ -82,7 +82,6 @@ feed_db_status_t import_csv_file_db(const char *path, const char *table, feed_db
     db->rc = sqlite3_exec(db->conn, create_query, NULL, NULL, &error_msg);
 
     free(create_query);
-    free_cstr_arr(field_names, field_count);
 
     if (db->rc) {
         if (error_msg != NULL) {
@@ -97,7 +96,9 @@ feed_db_status_t import_csv_file_db(const char *path, const char *table, feed_db
     }
 
     char *insert_query;
-    bake_insert_uni_query_db(table, field_count, &insert_query);
+    bake_insert_uni_query_db(table, field_count, field_names, &insert_query);
+
+    free_cstr_arr(field_names, field_count);
 
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db->conn, insert_query, -1, &stmt, NULL);

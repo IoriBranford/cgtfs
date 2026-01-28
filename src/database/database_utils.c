@@ -48,15 +48,26 @@ void bake_create_uni_query_db(const char *table_name, int field_count, char **fi
     insert_pos += snprintf(*query + insert_pos, query_length, "%s", query_ending);
 }
 
-void bake_insert_uni_query_db(const char *table_name, int field_count, char **query) {
+void bake_insert_uni_query_db(const char *table_name, int field_count, char **field_names, char **query) {
     char *query_beginning = "INSERT INTO ";
-    char *query_middle = " VALUES (";
+    char *query_middle = ") VALUES (";
     char *query_ending = ");";
 
-    int sql_insert_query_length = strlen(query_beginning) + strlen(table_name) + strlen(query_middle) + strlen(query_ending) + 1;
-    for (int i = 0; i < field_count; i++)
-        sql_insert_query_length += 4 + ((i > 9) ? 1 : 0);
+    int sql_insert_query_length =
+        strlen(query_beginning)
+        + strlen(table_name)
+        + 1 // '('
+        // field_names
+        + field_count - 1 // ','
+        + strlen(query_middle)
+        // values
+        + strlen(query_ending)
+        + 1; // '\0'
 
+    for (int i = 0; i < field_count; i++) {
+        sql_insert_query_length += strlen(field_names[i]);
+        sql_insert_query_length += 3 + ((i > 9) ? 1 : 0);
+    }
 
     *query = malloc(sql_insert_query_length * sizeof(char));
     if (*query == NULL) {
@@ -64,10 +75,14 @@ void bake_insert_uni_query_db(const char *table_name, int field_count, char **qu
     }
     int insert_pos = 0;
 
-    insert_pos += snprintf(*query, sql_insert_query_length, "%s%s%s", query_beginning, table_name, query_middle);
-    for (int i = 0; i < field_count - 1; i++)
-        insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, "?%i, ", i + 1);
-    insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, "?%i ", field_count - 1 + 1);
+    insert_pos += snprintf(*query, sql_insert_query_length, "%s%s(", query_beginning, table_name);
+    insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, "%s", field_names[0]);
+    for (int i = 1; i < field_count; i++)
+        insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, ",%s", field_names[i]);
+    insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, "%s", query_middle);
+    insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, "?%i", 1);
+    for (int i = 2; i <= field_count; i++)
+        insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, ",?%i", i);
     insert_pos += snprintf(*query + insert_pos, sql_insert_query_length, "%s", query_ending);
 }
 
